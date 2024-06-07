@@ -594,34 +594,6 @@ class Client(ExecutorEventEmitter):
         """
         self.send({"type": "triggerEvent", "id": eventId, "states": states})
 
-    def getChoiceUpdatelist(self):
-        """
-        This will return a dict that `choiceUpdate` registered.
-            example return value `{"choiceUpdateid1": ["item1", "item2", "item3"], "exampleChoiceId": ["Option1", "Option2", "Option3"]}`
-
-        You should use this to verify before Updating the choice list
-        **Note** This is the same as TPClient.choiceUpdateList variable *DO NOT MODIFY* TPClient.choiceUpdateList unless you know what your doing
-        """
-        return self.choiceUpdateList
-
-    def getStatelist(self):
-        """
-        This will return a dict that have key pair of states that you last updated.
-            Example retun value `{"stateId1": "value1", "stateId2": "value2", "stateId3": "value3"}`
-        This is used to keep track of all states. It will be automatically updated when you update states
-        **Note** This is the same as TPClient.currentState variable *DO NOT MODIFY* TPClient.currentState unless you know what your doing
-        """
-        return self.currentStates
-
-    def getSettinghistory(self):
-        """
-        This will return a dict that have key pair of setting value that you updated previously.
-
-        This is used to track settings value that you have updated previously
-        **Note** This is the same as TPClient.currentSettings variable *DO NOT MODIFY* TPClient.currentSettings unless you know what your doing
-        """
-        return self.currentSettings
-
     def send(self, data):
         """
         This will try to send any arbitrary Python object in `data` (presumably something `dict`-like) to Touch Portal
