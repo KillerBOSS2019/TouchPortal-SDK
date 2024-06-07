@@ -116,7 +116,7 @@ __copyright__ = """
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-__version__ = "1.7.10"  # this is read from setup.py and possibly other places
+__version__ = "1.8"  # this is read from setup.py and possibly other places
 
 # maintain backwards compatability
 from . client import Client, TYPES
