@@ -179,7 +179,7 @@ def _dictFromItem(item:dict, table:dict, sdk_v:int, path:str="", skip_invalid:bo
         # try get explicit value from item
         #if not data.get("doc"): continue
         if (v := item.get(k)) is None:
-            if (not data.get('r') or data.get('DV', 0) >= sdk_v):
+            if (not data.get('r') or data.get("DV", 0) >= sdk_v or data.get("v", 0) >= sdk_v) or "api" in k or "sdk" in k:
                 continue
             # try get default value
             v = data.get('d')
@@ -191,25 +191,37 @@ def _dictFromItem(item:dict, table:dict, sdk_v:int, path:str="", skip_invalid:bo
         # check that the value is valid and add it to the dict if it is
         # print(k, v)
         if validateAttribValue(k, v, data, sdk_v, path) or (not skip_invalid and v != None):
-            # if k == 'sdk':
+            # if k in ['sdk','api']:
                 # print(k, v, data, path)
             ret[k] = v
     return ret
 
 
 def _arrayFromDict(d:dict, table:dict, sdk_v:int, category:str=None, path:str="", skip_invalid:bool=False):
-    # print(d.items())
     ret = []
     if not isinstance(d, dict):
         return ret
+
+    if path in ["connectors", "actions"]:
+        _processFormat(d)
+
     for key, item in d.items():
         if not category or not (cat := item.get('category')) or cat == category:
             # print(item, table)
             ret.append(_dictFromItem(item, table, sdk_v, f"{path}[{key}]", skip_invalid))
-    if path in ["connectors", "actions"]:
-        _replaceFormatTokens(ret)
     return ret
 
+def _processFormat(d:dict):
+    if not isinstance(d, dict):
+        return
+    
+    for _, item in d.items():
+        if (data := item.get("data")) and isinstance(data, dict):
+            data_ids = {}
+            for k, v in data.items():
+                if (did := v.get("id")):
+                    data_ids[k] = did
+            _replaceFormatTokens(item=item, data_ids=data_ids)
 
 def _replaceFormat(data_ids:dict, fmt:str, d:dict):
     rx = re_compile(r'\$\[(\w+)\]')
@@ -229,29 +241,17 @@ def _replaceFormat(data_ids:dict, fmt:str, d:dict):
         begin = m.start() + len(val) + 4
     return fmt
 
-def _replaceFormatTokens(items:list):
-    # print(items)
-    for d in items:
-        if not isinstance(d, dict) or not 'data' in d.keys():
-            continue
-        data_ids = {}
-        for data in d.get('data'):
-            print(data)
-            if (did := data.get('id')):
-                data_ids[did.rsplit(".", 1)[-1]] = did
-        if not data_ids:
-            continue
-
-        if 'lines' in d.keys():
-            for k, v in d.get('lines').items():
-                for line in v:
-                    if (line_data := line.get('data')):
-                        for data in line_data:
-                            if not isinstance(data, dict) or not 'lineFormat' in data.keys():
-                                continue
-                            data['lineFormat'] = _replaceFormat(data_ids, data.get('lineFormat'), d)
-        elif 'format' in d.keys():
-            d['format'] = _replaceFormat(data_ids, d.get('format'), d)
+def _replaceFormatTokens(item:list, data_ids:dict):
+    if 'lines' in item.keys():
+        for k, v in item.get('lines').items():
+            for line in v:
+                if (line_data := line.get('data')):
+                    for data in line_data:
+                        if not isinstance(data, dict) or not 'lineFormat' in data.keys():
+                            continue
+                        data['lineFormat'] = _replaceFormat(data_ids, data.get('lineFormat'), item)
+    elif 'format' in item.keys():
+        item['format'] = _replaceFormat(data_ids, item.get('format'), item)
 
 
 def generateDefinitionFromScript(script:Union[str, TextIO], skip_invalid:bool=False):

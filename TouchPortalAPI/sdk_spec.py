@@ -38,7 +38,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-TPSDK_DEFAULT_VERSION = 6
+TPSDK_DEFAULT_VERSION = 7
 """ Default Touch Portal SDK version for generating entry.tp JSON. """
 
 TPSDK_ATTRIBS_SETTINGS_TOOLTIP = {
@@ -186,7 +186,7 @@ TPSDK_ATTRIBS_CONFIGURATION = {
 TPSDK_ATTRIBS_ROOT = {
 # key name              sdk V   required    [type(s)]    [default value]            [valid value list]   [lookup table] [Deprecate version(DV)]
   'sdk':              { 'v': 1, 'r': True,  't': int,   'd': TPSDK_DEFAULT_VERSION, 'c': [1,2,3,4,5,6], "DV": 7 }, 
-  'api':              { 'v': 7, 'r': True,  't': int,   'd': TPSDK_DEFAULT_VERSION, 'c': [1,2,3,4,5,6,7]},
+  'api':              { 'v': 7, 'r': True,  't': int,   'd': TPSDK_DEFAULT_VERSION, 'c': [1,2,3,4,5,6,7,8,9,10]},
   'version':          { 'v': 1, 'r': True,  't': int,   'd': 1 },
   'name':             { 'v': 1, 'r': True,  't': str },
   'id':               { 'v': 1, 'r': True,  't': str },
